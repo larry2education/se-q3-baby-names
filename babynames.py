@@ -31,6 +31,8 @@ Suggested milestones for incremental development:
  - Fix main() to use the extracted_names list
 """
 
+__author__ = "Larry Scott with help from Daniel & John"
+
 import sys
 import re
 import argparse
@@ -44,7 +46,24 @@ def extract_names(filename):
     ['2006', 'Aaliyah 91', 'Aaron 57', 'Abagail 895', ...]
     """
     names = []
-    # +++your code here+++
+
+    with open(filename) as f:
+        text = f.read()
+
+    year = re.findall(r'Popularity in (\d+)', text)
+
+    rank_names = re.findall(
+        r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', text)
+
+    rank_dict = {}
+    for rn in rank_names:
+        if rn[1] not in rank_dict:
+            rank_dict[rn[1]] = rn[0]
+        if rn[2] not in rank_dict:
+            rank_dict[rn[2]] = rn[0]
+    for name, rank in rank_dict.items():
+        year.append(f'{name} {rank}')
+    names = sorted(year)
     return names
 
 
@@ -82,7 +101,15 @@ def main(args):
     # Use the create_summary flag to decide whether to print the list
     # or to write the list to a summary file (e.g. `baby1990.html.summary`).
 
-    # +++your code here+++
+    for filename in file_list:
+        the_file = extract_names(filename)
+        if not create_summary:
+            print(*the_file, sep="\n")
+        else:
+            sum_file = filename + ".summary"
+            with open(sum_file, "w") as f:
+                for data in the_file:
+                    f.write(data + "\n")
 
 
 if __name__ == '__main__':
